@@ -18,6 +18,9 @@ logs
 .fleet
 .idea
 
+# Internal docs (working notes, not versioned yet)
+docs/
+
 # Local env files
 .env
 .env.*
