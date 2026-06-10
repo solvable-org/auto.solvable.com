@@ -1,3 +1,5 @@
+import { defineAppConfig } from 'nuxt/app';
+
 export default defineAppConfig({
   // Cake / AdQuadrant
   cakeApiUrl: 'https://vcapi.adquadrant.com/vtrack/auto-cake',
