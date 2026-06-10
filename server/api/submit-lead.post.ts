@@ -8,18 +8,21 @@ const CARRIER_MAP: Record<number, string> = {
   7: 'Independent Agent',
 }
 
-function getCkmConfig(pid: string, config: ReturnType<typeof useRuntimeConfig>) {
+type AppCfg = ReturnType<typeof useAppConfig>
+type RunCfg = ReturnType<typeof useRuntimeConfig>
+
+function getCkmConfig(pid: string, config: RunCfg, appConfig: AppCfg) {
   return pid === '1921'
-    ? { key: config.ckmKeyPid1921, campaignId: config.ckmCampaignPid1921 }
-    : { key: config.ckmKeyDefault, campaignId: config.ckmCampaignDefault }
+    ? { key: config.ckmKeyPid1921, campaignId: appConfig.ckmCampaignPid1921 }
+    : { key: config.ckmKeyDefault, campaignId: appConfig.ckmCampaignDefault }
 }
 
-function getLpKey(pid: string, config: ReturnType<typeof useRuntimeConfig>) {
+function getLpKey(pid: string, config: RunCfg) {
   return pid === '1921' ? config.lpKeyPid1921 : config.lpKey
 }
 
-function buildCakePayload(lead: LeadData, config: ReturnType<typeof useRuntimeConfig>) {
-  const { key: ckmKey, campaignId } = getCkmConfig(lead.pid, config)
+function buildCakePayload(lead: LeadData, config: RunCfg, appConfig: AppCfg) {
+  const { key: ckmKey, campaignId } = getCkmConfig(lead.pid, config, appConfig)
   const [firstName, ...rest] = (lead.first_name + ' ' + lead.last_name).trim().split(' ')
   const lastName = rest.join(' ') || firstName
 
@@ -65,13 +68,13 @@ function buildCakePayload(lead: LeadData, config: ReturnType<typeof useRuntimeCo
   }
 }
 
-function buildLpPayload(lead: LeadData, config: ReturnType<typeof useRuntimeConfig>) {
+function buildLpPayload(lead: LeadData, config: RunCfg, appConfig: AppCfg) {
   const lpKey = getLpKey(lead.pid, config)
   const primaryCar = lead.cars[0]
 
   return {
-    lp_campaign_id: config.lpCampaignId,
-    lp_supplier_id: config.lpSupplierId,
+    lp_campaign_id: appConfig.lpCampaignId,
+    lp_supplier_id: appConfig.lpSupplierId,
     lp_key: lpKey,
     zip_code: lead.zip,
     state: lead.state,
@@ -102,14 +105,15 @@ function buildLpPayload(lead: LeadData, config: ReturnType<typeof useRuntimeConf
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
+  const appConfig = useAppConfig()
   const lead = await readBody<LeadData>(event)
 
-  const cakePayload = buildCakePayload(lead, config)
-  const lpPayload = buildLpPayload(lead, config)
+  const cakePayload = buildCakePayload(lead, config, appConfig)
+  const lpPayload = buildLpPayload(lead, config, appConfig)
 
   // Submit Cake and LeadProsper in parallel
   const [cakeResult] = await Promise.allSettled([
-    $fetch(config.cakeApiUrl as string, {
+    $fetch(appConfig.cakeApiUrl as string, {
       method: 'POST',
       body: cakePayload,
     }),

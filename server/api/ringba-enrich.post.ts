@@ -1,11 +1,11 @@
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
+  const appConfig = useAppConfig()
   const body = await readBody(event)
 
-  if (!config.ringbaApiUrl) return { ok: true }
+  if (!appConfig.ringbaApiUrl) return { ok: true }
 
   try {
-    await $fetch(config.ringbaApiUrl as string, {
+    await $fetch(appConfig.ringbaApiUrl as string, {
       method: 'POST',
       body: body.lead,
     })

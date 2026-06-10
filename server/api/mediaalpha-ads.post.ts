@@ -2,11 +2,11 @@ import type { LeadData } from '~/types/lead'
 import type { MediaAlphaOffer } from '~/composables/useSubmitLead'
 
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
+  const appConfig = useAppConfig()
   const body = await readBody<{ lead: LeadData }>(event)
   const lead = body.lead
 
-  const placement = lead.pid === '1921' ? config.maPlacementPid1921 : config.maPlacementDefault
+  const placement = lead.pid === '1921' ? appConfig.maPlacementPid1921 : appConfig.maPlacementDefault
 
   if (!placement) return { offers: [] }
 
