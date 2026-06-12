@@ -1,0 +1,10 @@
+.git
+.github
+node_modules
+.nuxt
+.output
+.data
+Dockerfile
+.dockerignore
+*.md
+eslint.config.mjs
