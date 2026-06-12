@@ -45,3 +45,15 @@ jobs:
             -t "$IMG:latest" -t "$IMG:${{ github.sha }}" .
           docker push "$IMG:latest"
           docker push "$IMG:${{ github.sha }}"
+
+      # App Runner auto-deploys the new :latest image (~4 min); this just surfaces the URL.
+      - name: App URL
+        run: |
+          {
+            echo "### Deployed :rocket:"
+            echo ""
+            echo "App Runner is auto-deploying the new \`:latest\` image (~4 min)."
+            echo ""
+            echo "**URL:** ${{ vars.APP_URL }}"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice title=App URL::${{ vars.APP_URL }}"
